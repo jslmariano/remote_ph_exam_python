@@ -2,7 +2,7 @@ from flask import request
 from flask_restplus import Resource
 
 from ..util.dto import BusinessDto
-from ..service.google_vision_service import detect_faces_uri
+from ..service.google_vision_service import detect_faces_uri, detect_faces_uri_multple
 from ..service.yelp_service import business_search, business_reviews
 
 api = BusinessDto.api
@@ -17,13 +17,25 @@ class BusinessList(Resource):
         return {'message': 'Hello, I am your backend'}
 
 
-@api.route('/test')
+@api.route('/face')
 class BusinessTest(Resource):
 
-    @api.doc('just_a_test')
+    @api.doc('get_face_emotion_google_vision')
     def get(self):
         """List all registered users"""
         faces_emotions = detect_faces_uri()
+        result = dict()
+        result['message'] = 'Hello, I am your backend'
+        result['faces_emotions'] = faces_emotions
+        return result
+
+@api.route('/multiple_faces')
+class BusinessTest(Resource):
+
+    @api.doc('get_face_emotion_google_vision')
+    def get(self):
+        """List all registered users"""
+        faces_emotions = detect_faces_uri_multple()
         result = dict()
         result['message'] = 'Hello, I am your backend'
         result['faces_emotions'] = faces_emotions

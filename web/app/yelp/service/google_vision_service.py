@@ -2,9 +2,10 @@ import io
 import os
 
 # Imports the Google Cloud client library
-from google.cloud import vision
-from google.cloud.vision import types
 from google.oauth2 import service_account
+from google.cloud import vision
+from google.cloud.vision import enums
+from google.cloud.vision import types
 
 
 def test_google_vision():
@@ -118,5 +119,66 @@ def load_crendential_from_file(path = None):
 
     return credentials
 
-def detect_faces_uri_multple():
-    pass
+def detect_faces_uri_multple(uri = None):
+
+    # Instantiates a client
+    client = vision.ImageAnnotatorClient()
+
+    features = [
+        # types.Feature(type=enums.Feature.Type.LABEL_DETECTION),
+        types.Feature(type=enums.Feature.Type.FACE_DETECTION),
+    ]
+
+    requests = []
+
+    if uri is None:
+        uri = "https://storage.googleapis.com/cloud-vision-codelab/face_surprise.jpg"
+
+    image_uris = []
+    image_uris.append("https://storage.googleapis.com/cloud-vision-codelab/face_surprise.jpg")
+    image_uris.append("https://codelabs.developers.google.com/codelabs/cloud-vision-intro/img/e0600f08ea3d5c8a.jpeg")
+
+
+    for image_uri in image_uris:
+        image = types.Image()
+        image.source.image_uri = image_uri
+        request = types.AnnotateImageRequest(image=image, features=features)
+        requests.append(request)
+
+    response = client.batch_annotate_images(requests)
+
+    face_index = 0
+    faces_batched = []
+    for annotation_response in response.responses:
+        item_date = dict()
+        item_date['face_request'] = face_index
+        item_date['from_url'] = image_uris[face_index]
+        item_date['faces_emotions'] = parse_face_emotions(annotation_response.face_annotations)
+        faces_batched.append(item_date)
+        print(face_index)
+        face_index += 1
+
+
+    return faces_batched
+
+def parse_face_emotions(face_annotations):
+
+    # Names of likelihood from google.cloud.vision.enums
+    likelihood_name = ('UNKNOWN', 'VERY_UNLIKELY', 'UNLIKELY', 'POSSIBLE',
+                       'LIKELY', 'VERY_LIKELY')
+
+    faces_emotions = []
+
+    face_index = 0
+    for face in face_annotations:
+        face_emotion = dict()
+        face_emotion['face_number'] = face_index
+        face_emotion['anger_likelihood'] = likelihood_name[face.anger_likelihood]
+        face_emotion['joy_likelihood'] = likelihood_name[face.joy_likelihood]
+        face_emotion['surprise_likelihood'] = likelihood_name[face.surprise_likelihood]
+        face_emotion['sorrow_likelihood'] = likelihood_name[face.sorrow_likelihood]
+        face_index += 1
+
+        faces_emotions.append(face_emotion)
+
+    return faces_emotions

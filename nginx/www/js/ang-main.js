@@ -36,6 +36,11 @@ app.controller('MainController', function($scope, $http)
             {
                 console.log(response);
                 $scope.businesses = response.data.business_search.businesses;
+
+                // reset views too
+                if (!response.data.business_search.businesses.length) {
+                    $scope.business_reviews = [];
+                }
             }, function error(response)
             {
                 console.log(response);
