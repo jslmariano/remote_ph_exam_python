@@ -2,7 +2,7 @@ from flask import request
 from flask_restplus import Resource
 
 from ..util.dto import BusinessDto
-from ..service.google_vision_service import test_google_vision
+from ..service.google_vision_service import test_google_vision, detect_faces, detect_faces_uri
 
 api = BusinessDto.api
 _business = BusinessDto.business
@@ -23,5 +23,7 @@ class BusinessCsv(Resource):
     def get(self):
         """List all registered users"""
         test_google_vision()
+        detect_faces()
+        detect_faces_uri()
         return {'message': 'Hello, I am your backend'}
 
