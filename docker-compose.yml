@@ -45,14 +45,17 @@ services:
   #     - jsl-network
 
   nginx:
-    image: nginx:alpine
+    build:
+      context: ./nginx
+      dockerfile: ../docker_compose/nginx/Dockerfile
+    image: jsl-nginx
     container_name: jsl-nginx
     restart: unless-stopped
     tty: true
     ports:
       - "80:80"
     volumes:
-      - ./:/var/www
+      - ./nginx/www:/usr/share/nginx/html
       - ./docker_compose/nginx/conf.d/:/etc/nginx/conf.d/
     env_file:
       - ./docker_compose/nginx/.env
