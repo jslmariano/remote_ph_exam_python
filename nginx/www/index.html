@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta http-equiv="x-ua-compatible" content="ie=edge" />
         <title>Yelp with a twist!</title>
+        <base href="/" />
         <!-- Font Awesome -->
         <link href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" rel="stylesheet"/>
         <!-- Google Fonts -->
@@ -99,7 +100,7 @@
                                 data-review_id="{{ business_review.id }}">
                                 <div class="media">
                                   <img class="d-flex mr-3 thumb-size img-thumbnail img-fluid"
-                                        src="{{ business_review.user.image_url }}"
+                                        src="{{ business_review.user_image_url }}"
                                         on-error="/images/No-image-found.jpg"
                                         alt="{{ business_review.user.name }}">
                                   <div class="media-body">

@@ -116,7 +116,7 @@ def scrape_reviews_api(business_alias, start = 0):
             img_basename = os.path.basename(image_url)
             if img_basename == "user_60_square.png":
                 # User has no photo
-                review['user_image_url'] = None
+                review['user_image_url'] = "/images/No-image-found.jpg"
                 continue
             img_name, img_ext =  img_basename.split(".")
             new_img_basename = "o.{}".format(img_ext)
