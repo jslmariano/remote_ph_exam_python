@@ -27,3 +27,4 @@ class BusinessCsv(Resource):
         result['message'] = 'Hello, I am your backend'
         result['faces_emotions'] = faces_emotions
         return result
+
