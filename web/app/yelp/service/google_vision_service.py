@@ -4,6 +4,7 @@ import os
 # Imports the Google Cloud client library
 from google.cloud import vision
 from google.cloud.vision import types
+from google.oauth2 import service_account
 
 
 def test_google_vision():
@@ -87,10 +88,22 @@ def detect_faces_uri(uri = None):
                        'LIKELY', 'VERY_LIKELY')
     print('Faces:')
 
+    faces_emotions = []
+
+    print(faces)
+
     for face in faces:
         print('anger: {}'.format(likelihood_name[face.anger_likelihood]))
         print('joy: {}'.format(likelihood_name[face.joy_likelihood]))
         print('surprise: {}'.format(likelihood_name[face.surprise_likelihood]))
+
+        face_emotion = dict()
+        face_emotion['anger_likelihood'] = likelihood_name[face.anger_likelihood]
+        face_emotion['joy_likelihood'] = likelihood_name[face.joy_likelihood]
+        face_emotion['surprise_likelihood'] = likelihood_name[face.surprise_likelihood]
+        face_emotion['sorrow_likelihood'] = likelihood_name[face.sorrow_likelihood]
+
+        faces_emotions.append(face_emotion)
 
         vertices = (['({},{})'.format(vertex.x, vertex.y)
                     for vertex in face.bounding_poly.vertices])
@@ -102,3 +115,18 @@ def detect_faces_uri(uri = None):
             '{}\nFor more info on error messages, check: '
             'https://cloud.google.com/apis/design/errors'.format(
                 response.error.message))
+
+    return faces_emotions
+
+def load_crendential_from_file(path = None):
+        # TODO(developer): Set key_path to the path to the service account key
+    #                  file.
+    # key_path = "path/to/service_account.json"
+
+    credentials = service_account.Credentials.from_service_account_file(
+        os.path.abspath('gcp_keys/service_account_key.json'),
+        scopes=["https://www.googleapis.com/auth/cloud-platform"],
+    )
+
+    print(credentials)
+    return credentials

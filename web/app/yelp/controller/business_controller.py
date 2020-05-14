@@ -22,8 +22,9 @@ class BusinessCsv(Resource):
     @api.doc('just_a_test')
     def get(self):
         """List all registered users"""
-        test_google_vision()
-        detect_faces()
-        detect_faces_uri()
-        return {'message': 'Hello, I am your backend'}
+        faces_emotions = detect_faces_uri()
+        result = dict()
+        result['message'] = 'Hello, I am your backend'
+        result['faces_emotions'] = faces_emotions
+        return result
 
