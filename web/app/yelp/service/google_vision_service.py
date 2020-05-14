@@ -86,17 +86,10 @@ def detect_faces_uri(uri = None):
     # Names of likelihood from google.cloud.vision.enums
     likelihood_name = ('UNKNOWN', 'VERY_UNLIKELY', 'UNLIKELY', 'POSSIBLE',
                        'LIKELY', 'VERY_LIKELY')
-    print('Faces:')
 
     faces_emotions = []
 
-    print(faces)
-
     for face in faces:
-        print('anger: {}'.format(likelihood_name[face.anger_likelihood]))
-        print('joy: {}'.format(likelihood_name[face.joy_likelihood]))
-        print('surprise: {}'.format(likelihood_name[face.surprise_likelihood]))
-
         face_emotion = dict()
         face_emotion['anger_likelihood'] = likelihood_name[face.anger_likelihood]
         face_emotion['joy_likelihood'] = likelihood_name[face.joy_likelihood]
@@ -105,6 +98,7 @@ def detect_faces_uri(uri = None):
 
         faces_emotions.append(face_emotion)
 
+        # Not deleting this might come handy next time
         vertices = (['({},{})'.format(vertex.x, vertex.y)
                     for vertex in face.bounding_poly.vertices])
 
@@ -119,14 +113,10 @@ def detect_faces_uri(uri = None):
     return faces_emotions
 
 def load_crendential_from_file(path = None):
-        # TODO(developer): Set key_path to the path to the service account key
-    #                  file.
-    # key_path = "path/to/service_account.json"
 
     credentials = service_account.Credentials.from_service_account_file(
-        os.path.abspath('gcp_keys/service_account_key.json'),
+        os.path.abspath(os.getenv('GOOGLE_APPLICATION_CREDENTIALS', None)),
         scopes=["https://www.googleapis.com/auth/cloud-platform"],
     )
 
-    print(credentials)
     return credentials
