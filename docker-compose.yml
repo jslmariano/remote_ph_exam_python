@@ -5,8 +5,8 @@ services:
     build:
       context: ./web
       dockerfile: ../docker_compose/app/Dockerfile
-    image: remote-ph-app
-    container_name: remote-ph-app
+    image: jsl-app
+    container_name: jsl-app
     restart: unless-stopped
     tty: true
     expose:
@@ -22,31 +22,31 @@ services:
       APP_NAME: 'FlaskApp'
     # command: gunicorn --reload wsgi:app -w 1 -b 0.0.0.0:8080
     networks:
-      - remote-ph-network
+      - jsl-network
 
-  vue_ui:
-    build:
-      context: ./vue_ui
-      dockerfile: ../docker_compose/vue_ui/Dockerfile
-    image: remote-ph-vue_ui
-    container_name:  remote-ph-vue_ui
-    restart: unless-stopped
-    tty: true
-    ports:
-        - "8000:8000"
-        - "5000:5000"
-    stdin_open: true
-    #  mount the volumes so we can change code and hot reload
-    # volumes:
-    #     - './vue_ui:/vue_ui'
-    #  port allows the host machine to link to container
-    #  8000 for vue ui, 5000 for our vue app
-    networks:
-      - remote-ph-network
+  # vue_ui:
+  #   build:
+  #     context: ./vue_ui
+  #     dockerfile: ../docker_compose/vue_ui/Dockerfile
+  #   image: jsl-vue_ui
+  #   container_name:  jsl-vue_ui
+  #   restart: unless-stopped
+  #   tty: true
+  #   ports:
+  #       - "8000:8000"
+  #       - "5000:5000"
+  #   stdin_open: true
+  #   #  mount the volumes so we can change code and hot reload
+  #   # volumes:
+  #   #     - './vue_ui:/vue_ui'
+  #   #  port allows the host machine to link to container
+  #   #  8000 for vue ui, 5000 for our vue app
+  #   networks:
+  #     - jsl-network
 
   nginx:
     image: nginx:alpine
-    container_name: remote-ph-nginx
+    container_name: jsl-nginx
     restart: unless-stopped
     tty: true
     ports:
@@ -60,12 +60,12 @@ services:
       SERVICE_NAME: mongodb
       SERVICE_TAGS: dev
     networks:
-      - remote-ph-network
+      - jsl-network
 
   postgres:
     build: ./docker_compose/postgres/
-    image: remote-ph-postgres
-    container_name: remote-ph-postgres
+    image: jsl-postgres
+    container_name: jsl-postgres
     restart: unless-stopped
     tty: true
     ports:
@@ -78,11 +78,11 @@ services:
       SERVICE_NAME: postgres
       SERVICE_TAGS: dev
     networks:
-      - remote-ph-network
+      - jsl-network
 
   mongodb:
     image: mongo:4.0.8
-    container_name: remote-ph-mongo
+    container_name: jsl-mongo
     restart: unless-stopped
     tty: true
     ports:
@@ -93,11 +93,11 @@ services:
       - ./docker_compose/mongodb/.env
     command: mongod --auth
     networks:
-      - remote-ph-network
+      - jsl-network
 
   redis:
     image: redis:latest
-    container_name: remote-ph-redis
+    container_name: jsl-redis
     restart: unless-stopped
     tty: true
     ports:
@@ -105,10 +105,10 @@ services:
     volumes:
       - redisdata:/data
     networks:
-      - remote-ph-network
+      - jsl-network
 
 networks:
-  remote-ph-network:
+  jsl-network:
     driver: bridge
 
 volumes:
