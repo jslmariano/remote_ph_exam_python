@@ -35,8 +35,37 @@ app.controller('MainController', function($scope, $http, $location, $window)
     $scope.search_params.longtitude = '14.6091';
     $scope.search_params.latitude = '121.0223';
 
+    $scope.STATUS_LOADING = 1;
+    $scope.STATUS_DONE = 0;
+
+    $scope.statuses = {}
+    $scope.statuses.search = 0
+    $scope.statuses.search_display = "Search"
+    $scope.statuses.reviews = 0
+
+    $scope.set_search_status = function(status) {
+        if (status == $scope.STATUS_LOADING) {
+            $scope.statuses.search = $scope.STATUS_LOADING
+            $scope.statuses.search_display = "Searching"
+        }
+        else {
+            $scope.statuses.search = $scope.STATUS_DONE
+            $scope.statuses.search_display = "Search"
+        }
+    }
+
+    $scope.set_reviews_status = function(status) {
+        if (status == $scope.STATUS_LOADING) {
+            $scope.statuses.reviews = $scope.STATUS_LOADING
+        }
+        else {
+            $scope.statuses.reviews = $scope.STATUS_DONE
+        }
+    }
+
     $scope.search_name = function()
     {
+        $scope.set_search_status(1)
         $http(
             {
                 method: "GET",
@@ -47,21 +76,23 @@ app.controller('MainController', function($scope, $http, $location, $window)
             {
                 console.log(response);
                 $scope.businesses = response.data.business_search.businesses;
-
-                // reset views too
-                if (!response.data.business_search.businesses.length)
-                {
-                    $scope.business_reviews = [];
-                }
+                $scope.business_reviews = [];
+                $scope.set_search_status(0)
             }, function error(response)
             {
                 console.log(response);
                 $scope.businesses = [];
+                $scope.set_search_status(0)
             });
     }
 
     $scope.fetch_reviews = function($event)
     {
+        // Do not proceed while soul searching
+        if ($scope.statuses.search == $scope.STATUS_LOADING) {
+            return false;
+        }
+
         // Do not fetch if no review
         review_count = $event.currentTarget.dataset.review_count
         if (parseInt(review_count) <= 0)
@@ -75,8 +106,7 @@ app.controller('MainController', function($scope, $http, $location, $window)
         business_datas['business_id'] = $event.currentTarget.dataset.business_id
 
         // Switch api mode
-        default_api = "/api/v1/yelp/business/reviews"
-        mode_api = default_api
+        mode_api = "/api/v1/yelp/business/scrape_reviews_page"
         url_params = $scope.get_params(window.location.href)
         if (url_params.hasOwnProperty('mode'))
         {
@@ -84,13 +114,13 @@ app.controller('MainController', function($scope, $http, $location, $window)
             {
                 mode_api = "/api/v1/yelp/business/scrape_reviews_api"
             }
-            else if (url_params['mode'] == "yelp_page")
+            else if (url_params['mode'] == "yelp_api")
             {
-                mode_api = "/api/v1/yelp/business/scrape_reviews_page"
+                mode_api = "/api/v1/yelp/business/reviews"
             }
         }
 
-
+        $scope.set_reviews_status(1);
         $http(
             {
                 // http://localhost/api/v1/yelp/business/reviews?alias=spiral-pasay-2
@@ -102,10 +132,12 @@ app.controller('MainController', function($scope, $http, $location, $window)
             {
                 console.log(response);
                 $scope.business_reviews = response.data.business_reviews.reviews;
+                $scope.set_reviews_status(0);
             }, function error(response)
             {
                 console.log(response);
                 $scope.business_reviews = [];
+                $scope.set_reviews_status(0);
             });
     }
 

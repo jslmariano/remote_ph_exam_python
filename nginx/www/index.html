@@ -47,7 +47,10 @@
                     <div class="col-12">
                         <form class="form-inline mr-auto" ng-submit="search_name()">
                           <input class="form-control mr-sm-2 col-6" id="business-search" ng-model="search_params.term" type="text" placeholder="Search Business Name" aria-label="Search Business Name" required="required">
-                          <button class="btn btn-primary btn-rounded btn-md my-0 business-search-button" type="submit">Search</button>
+                          <button class="btn btn-primary btn-rounded btn-md my-0 business-search-button" type="submit" ng-disabled="(statuses.search)">
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" ng-show="(statuses.search)" ></span>
+                              &nbsp; {{ statuses.search_display }}
+                          </button>
                         </form>
                     </div>
                     <!-- SEARCH FORM -->
@@ -96,8 +99,7 @@
                         <div class="col-12 overflow-auto business-reviews-container">
 
                             <section class="section-preview business-review-item"
-                                ng-repeat="business_review in business_reviews"
-                                data-review_id="{{ business_review.id }}">
+                                ng-repeat="business_review in business_reviews">
                                 <div class="media">
                                   <img class="d-flex mr-3 thumb-size img-thumbnail img-fluid"
                                         src="{{ business_review.user_image_url }}"
@@ -134,6 +136,14 @@
                             <!-- EMPTY DATA -->
                             <section class="section-preview" ng-show="!business_reviews.length">
                                 No business reviews yet
+                            </section>
+                            <!-- EMPTY DATA END -->
+                            <!-- EMPTY DATA -->
+                            <section class="section-preview" ng-show="(statuses.reviews)">
+                                <div class="spinner-border" role="status">
+                                  <span class="sr-only">Loading...</span>
+                                </div>
+                                Looking for reviews
                             </section>
                             <!-- EMPTY DATA END -->
 
