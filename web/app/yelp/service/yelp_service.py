@@ -59,31 +59,30 @@ def business_reviews(business_alias):
     response = requests.request("GET", url, headers=headers, data = payload)
     response_dict = response.json()
 
+    # Do not procced if no reviews
+    if "reviews" not in response_dict:
+        return response_dict
+
+    # Get all user image urls
     user_image_urls = []
+    for review in response_dict['reviews']:
+        # shift user.umage_url to parent level for easy lookup later
+        image_url = review['user']['image_url']
+        review['user_image_url'] = image_url
+        user_image_urls.append(image_url)
 
-    # If theres reviews then we proceed to google vision api, little overhead
-    # here though
-    if "reviews" in response_dict:
+    # Batch process image anotations, to avoid one by one request
+    images_annotations = batch_detect_faces_uri(user_image_urls)
 
-        # Get all user image urls
-        for review in response_dict['reviews']:
-            # shift user.umage_url to parent level for easy lookup later
-            image_url = review['user']['image_url']
-            review['user_image_url'] = image_url
-            user_image_urls.append(image_url)
-
-        # Batch process image anotations, to avoid one by one request
-        images_annotations = batch_detect_faces_uri(user_image_urls)
-
-        # # Map all anotations to reviews
-        for images_annotation in images_annotations:
-            # REF :
-            # https://www.geeksforgeeks.org/python-find-dictionary-matching-value-in-list/
-            # Using next() + dictionary comprehension Find dictionary matching
-            # value in list
-            res = next((review for review in response_dict['reviews'] if review['user_image_url'] == images_annotation['from_url']), None)
-            if res:
-                res['images_annotation'] = images_annotation
+    # # Map all anotations to reviews
+    for images_annotation in images_annotations:
+        # REF :
+        # https://www.geeksforgeeks.org/python-find-dictionary-matching-value-in-list/
+        # Using next() + dictionary comprehension Find dictionary matching
+        # value in list
+        res = next((review for review in response_dict['reviews'] if review['user_image_url'] == images_annotation['from_url']), None)
+        if res:
+            res['images_annotation'] = images_annotation
 
     return response_dict
 
@@ -101,34 +100,35 @@ def scrape_reviews_api(business_id, start = 0):
     query_params['sort_by'] = 'relevance_desc'
     # Somehow not needed for now
     # query_params['q'] = None
-
     query_params_encoded = urlencode(query_params)
 
     url = "https://www.yelp.com/biz/{}/review_feed?{}".format(business_id, query_params_encoded)
     response = requests.request("GET", url, headers=headers, data = payload)
     response_dict = response.json()
 
+    # Do not procced if no reviews
+    if "reviews" not in response_dict:
+        return response_dict
+
+    # Get all user image urls
     user_image_urls = []
+    for review in response_dict['reviews']:
+        # layout compatiblities
+        review['user']['name'] = review['user']['altText']
+        # shift user.umage_url to parent level for easy lookup later
+        image_url = review['user']['src']
+        # little modification to get the HD pic
+        format_image_hd_link
+        image_url = os.path.basename(image_url)
+        review['user_image_url'] = image_url
+        if image_url == "/images/No-image-found.jpg":
+            # User has no photo
+            continue
+        user_image_urls.append(image_url)
 
-    # If theres reviews then we proceed to google vision api, little overhead
-    # here though
-    if "reviews" in response_dict:
-
-        # Get all user image urls
-        for review in response_dict['reviews']:
-            # layout compatiblities
-            review['user']['name'] = review['user']['altText']
-            # shift user.umage_url to parent level for easy lookup later
-            image_url = review['user']['src']
-            # little modification to get the HD pic
-            format_image_hd_link
-            image_url = os.path.basename(image_url)
-            review['user_image_url'] = image_url
-            if image_url == "/images/No-image-found.jpg":
-                # User has no photo
-                continue
-            user_image_urls.append(image_url)
-
+    # Split for quota
+    user_image_urls = split_to_quota(user_image_urls)
+    for _image_urls in user_image_urls:
         # Batch process image anotations, to avoid one by one request
         images_annotations = batch_detect_faces_uri(user_image_urls)
 
@@ -190,20 +190,34 @@ def scrape_reviews_page(business_alias):
     if not total:
         return {'reviews' : review_lists}
 
-    # Batch process image anotations, to avoid one by one request
-    # images_annotations = batch_detect_faces_uri(user_image_urls)
+    # Split for quota
+    user_image_urls = split_to_quota(user_image_urls)
+    for _image_urls in user_image_urls:
+        # Batch process image anotations, to avoid one by one request
+        images_annotations = batch_detect_faces_uri(_image_urls)
 
-    # # # Map all anotations to reviews
-    # for images_annotation in images_annotations:
-    #     # REF :
-    #     # https://www.geeksforgeeks.org/python-find-dictionary-matching-value-in-list/
-    #     # Using next() + dictionary comprehension Find dictionary matching
-    #     # value in list
-    #     res = next((review for review in review_lists if review['user_image_url'] == images_annotation['from_url']), None)
-    #     if res:
-    #         res['images_annotation'] = images_annotation
+        # Map all anotations to reviews
+        for images_annotation in images_annotations:
+            # REF :
+            # https://www.geeksforgeeks.org/python-find-dictionary-matching-value-in-list/
+            # Using next() + dictionary comprehension Find dictionary matching
+            # value in list
+            res = next((review for review in review_lists if review['user_image_url'] == images_annotation['from_url']), None)
+            if res:
+                res['images_annotation'] = images_annotation
 
-    return {'reviews' : user_image_urls}
+    return {'reviews' : review_lists, 'review_lists' : user_image_urls}
+
+
+def split_to_quota(user_image_urls):
+
+    # AVOIDING grpc_message : "Too many images per request" error WORKAROUND
+    # REF: https://cloud.google.com/vision/quotas
+    # Break image urls into per 10 parts.,
+    max_quota = 15
+
+    # using list comprehension
+    return [user_image_urls[i:i + max_quota] for i in range(0, len(user_image_urls), max_quota)]
 
 
 def format_image_hd_link(image_url):
