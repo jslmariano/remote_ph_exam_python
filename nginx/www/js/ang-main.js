@@ -57,34 +57,15 @@ app.controller('MainController', function($scope, $http)
             return false;
         }
 
-        business_alias = $event.currentTarget.dataset.alias
+        business_datas = {}
+        business_datas['alias'] = $event.currentTarget.dataset.alias
+        business_datas['business_id'] = $event.currentTarget.dataset.business_id
         $http(
             {
                 // http://localhost/api/v1/yelp/business/reviews?alias=spiral-pasay-2
                 method: "GET",
                 url: "/api/v1/yelp/business/reviews",
-                params: {'alias': business_alias}
-            })
-            .then(function success(response)
-            {
-                console.log(response);
-                $scope.business_reviews = response.data.business_reviews.reviews;
-            }, function error(response)
-            {
-                console.log(response);
-                $scope.business_reviews = [];
-            });
-    }
-
-    $scope.fetch_emotions = function($event)
-    {
-        business_alias = $event.currentTarget.dataset.alias
-        $http(
-            {
-                // http://localhost/api/v1/yelp/business/reviews?alias=spiral-pasay-2
-                method: "GET",
-                url: "/api/v1/yelp/business/reviews",
-                params: {'alias': business_alias}
+                params: business_datas
             })
             .then(function success(response)
             {

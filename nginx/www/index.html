@@ -63,6 +63,7 @@
                                     ng-repeat="business in businesses"
                                     ng-click="fetch_reviews($event)"
                                     data-alias="{{ business.alias }}"
+                                    data-business_id="{{ business.id }}"
                                     data-review_count="{{ business.review_count }}">
                                     <div class="media">
                                       <img class="d-flex mr-3 thumb-size img-thumbnail img-fluid"
@@ -89,38 +90,52 @@
                     <!-- REVIEWS LIST -->
                     <div class="col-6">
                         <div class="col-12">
-                            <h4 class="text-left">Business Reviews</h4>
+                            <h4 class="text-left">Reviewer's Avatars</h4>
                         </div>
                         <div class="col-12 overflow-auto business-reviews-container">
-                            <section class="section-preview">
-                                <ul class="list-unstyled">
-                                <!-- PER ITEM REVIEW -->
-                                  <li class="media"
-                                    ng-repeat="business_review in business_reviews"
-                                    data-review_id="{{ business_review.id }}">
-                                    <img class="d-flex mr-3 thumb-size img-thumbnail img-fluid"
+
+                            <section class="section-preview business-review-item"
+                                ng-repeat="business_review in business_reviews"
+                                data-review_id="{{ business_review.id }}">
+                                <div class="media">
+                                  <img class="d-flex mr-3 thumb-size img-thumbnail img-fluid"
                                         src="{{ business_review.user.image_url }}"
                                         on-error="/images/No-image-found.jpg"
                                         alt="{{ business_review.user.name }}">
-                                    <div class="media-body">
-                                      <h5 class="mt-0 mb-2 font-weight-bold">{{ business_review.user.name }}</h5>
-                                      <!--Review-->
-                                      <i class="fas fa-star blue-text"> </i>
-                                      <i class="fas fa-star blue-text"> </i>
-                                      <i class="fas fa-star blue-text"> </i>
-                                      <i class="fas fa-star blue-text"> </i>
-                                      <i class="fas fa-star blue-text"> </i>
-                                      <p>{{ business_review.text }}</p>
-                                    </div>
-                                  </li>
-                                <!-- PER ITEM REVIEW END -->
-                                <!-- EMPTY DATA -->
-                                  <li class="media" ng-show="!business_reviews.length">
-                                    No business reviews yet
-                                  </li>
-                                <!-- EMPTY DATA END -->
-                                </ul>
+                                  <div class="media-body">
+                                    <h5 class="mt-0 font-weight-bold">{{ business_review.user.name }}</h5>
+
+                                    <!--  Just a wild test of undefined variable -->
+                                    {{ business_review.images_annotationss.asdasd }}
+
+                                    <!--  Google Vision API Emotion Datas -->
+                                    <table class="table table-sm"
+                                           ng-repeat="faces_emotion in business_review.images_annotation.faces_emotions">
+                                        <tbody>
+                                            <tr>
+                                                <th colspan="2">Face # {{ faces_emotion.face_number }}</th>
+                                            </tr>
+                                            <tr>
+                                                <th>Joy</th>
+                                                <th>{{ faces_emotion.joy_likelihood }}</th>
+                                            </tr>
+                                            <tr>
+                                                <th>Sorrow</th>
+                                                <th>{{ faces_emotion.sorrow_likelihood }}</th>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                        <!--  Google Vision API Emotion Datas -->
+                                  </div>
+                                </div>
                             </section>
+                            <!-- PER ITEM NAMES END -->
+                            <!-- EMPTY DATA -->
+                            <section class="section-preview" ng-show="!business_reviews.length">
+                                No business reviews yet
+                            </section>
+                            <!-- EMPTY DATA END -->
+
                         </div>
                     </div>
                     <!-- REVIEWS LIST -->

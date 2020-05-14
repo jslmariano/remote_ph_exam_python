@@ -89,10 +89,13 @@ def detect_faces_uri(uri = None):
 
     for face in faces:
         face_emotion = dict()
-        face_emotion['anger_likelihood'] = likelihood_name[face.anger_likelihood]
         face_emotion['joy_likelihood'] = likelihood_name[face.joy_likelihood]
-        face_emotion['surprise_likelihood'] = likelihood_name[face.surprise_likelihood]
         face_emotion['sorrow_likelihood'] = likelihood_name[face.sorrow_likelihood]
+        face_emotion['anger_likelihood'] = likelihood_name[face.anger_likelihood]
+        face_emotion['surprise_likelihood'] = likelihood_name[face.surprise_likelihood]
+        face_emotion['under_exposed_likelihood'] = likelihood_name[face.under_exposed_likelihood]
+        face_emotion['blurred_likelihood'] = likelihood_name[face.blurred_likelihood]
+        face_emotion['headwear_likelihood'] = likelihood_name[face.blurred_likelihood]
 
         faces_emotions.append(face_emotion)
 
@@ -119,7 +122,10 @@ def load_crendential_from_file(path = None):
 
     return credentials
 
-def detect_faces_uri_multple(uri = None):
+def detect_faces_uri_multple(image_uris = []):
+
+    if not image_uris:
+        return []
 
     # Instantiates a client
     client = vision.ImageAnnotatorClient()
@@ -130,14 +136,6 @@ def detect_faces_uri_multple(uri = None):
     ]
 
     requests = []
-
-    if uri is None:
-        uri = "https://storage.googleapis.com/cloud-vision-codelab/face_surprise.jpg"
-
-    image_uris = []
-    image_uris.append("https://storage.googleapis.com/cloud-vision-codelab/face_surprise.jpg")
-    image_uris.append("https://codelabs.developers.google.com/codelabs/cloud-vision-intro/img/e0600f08ea3d5c8a.jpeg")
-
 
     for image_uri in image_uris:
         image = types.Image()
@@ -173,10 +171,14 @@ def parse_face_emotions(face_annotations):
     for face in face_annotations:
         face_emotion = dict()
         face_emotion['face_number'] = face_index
-        face_emotion['anger_likelihood'] = likelihood_name[face.anger_likelihood]
         face_emotion['joy_likelihood'] = likelihood_name[face.joy_likelihood]
-        face_emotion['surprise_likelihood'] = likelihood_name[face.surprise_likelihood]
         face_emotion['sorrow_likelihood'] = likelihood_name[face.sorrow_likelihood]
+        face_emotion['anger_likelihood'] = likelihood_name[face.anger_likelihood]
+        face_emotion['surprise_likelihood'] = likelihood_name[face.surprise_likelihood]
+        face_emotion['under_exposed_likelihood'] = likelihood_name[face.under_exposed_likelihood]
+        face_emotion['blurred_likelihood'] = likelihood_name[face.blurred_likelihood]
+        face_emotion['headwear_likelihood'] = likelihood_name[face.blurred_likelihood]
+
         face_index += 1
 
         faces_emotions.append(face_emotion)
