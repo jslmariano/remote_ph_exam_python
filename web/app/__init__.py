@@ -4,7 +4,7 @@ from flask import Blueprint
 # Import apidoc for monkey patching
 from flask_restplus.apidoc import apidoc
 
-URL_PREFIX = '/api'
+URL_PREFIX = '/api/v1'
 
 # Make a global change setting the URL prefix for the swaggerui at the module level
 apidoc.url_prefix = URL_PREFIX

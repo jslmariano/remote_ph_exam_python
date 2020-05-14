@@ -1,65 +1,155 @@
-<!DOCTYPE html>
+<!DOCTYPE doctype html>
 <html lang="en">
     <head>
-        <title>
-            Bootstrap Example
-        </title>
-        <meta charset="utf-8">
-            <meta content="width=device-width, initial-scale=1" name="viewport">
-                <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
-                    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js">
-                    </script>
-                    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js">
-                    </script>
-                </link>
-            </meta>
-        </meta>
+        <!-- Required meta tags -->
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <title>Yelp with a twist!</title>
+        <!-- Font Awesome -->
+        <link href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" rel="stylesheet"/>
+        <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet"/>
+        <!-- Bootstrap core CSS -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet"/>
+        <!-- Material Design Bootstrap -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.18.0/css/mdb.min.css" rel="stylesheet"/>
+        <!-- CUSTOM CSS -->
+        <link rel="stylesheet" type="text/css" href="css/main.css">
     </head>
     <body>
-        <div class="jumbotron text-center">
-            <h1>
-                My First Bootstrap Page
-            </h1>
-            <p>
-                Resize this responsive page to see the effect!
-            </p>
-        </div>
-        <div class="container">
-            <div class="row">
-                <div class="col-sm-4">
-                    <h3>
-                        Column 1
-                    </h3>
-                    <p>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit...
-                    </p>
-                    <p>
-                        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...
-                    </p>
+        <!--Main Navigation-->
+        <header>
+            <nav class="navbar fixed-top navbar-expand-lg navbar-dark blue scrolling-navbar">
+                <a class="navbar-brand" href="#"><strong>YELP / GOOGLE VISION / DEMO</strong></a>
+            </nav>
+        </header>
+        <!--Main Navigation-->
+
+        <!--Main Layout-->
+        <main>
+            <div class="container-fluid documentation" ng-app="myApp" ng-controller="MainController">
+
+                <!-- PAGE INTRO -->
+                <div class="row mt-5 pt-5" style="height:300px;">
+                    <div class="col text-center">
+                        <h2>Yelp with a twist!</h2>
+                        <h5>This is just a working demo between yelp and google vision api</h5>
+                        <br>
+                        <p class="text-justif info-text">Searches somehow locked to MANILA coordinates but may return other addresses depending on YELP API, Use the sarch box to populate the business names. Then choose from business names on the left side panel to show the reveiws with the emotions tag names <b>"joyLikelihood"</b> and <b>"sorrowLikelihood"</b> per review</p>
+                    </div>
                 </div>
-                <div class="col-sm-4">
-                    <h3>
-                        Column 2
-                    </h3>
-                    <p>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit...
-                    </p>
-                    <p>
-                        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...
-                    </p>
+                <!-- PAGE INTRO -->
+
+                <div class="row">
+                    <!-- SEARCH FORM -->
+                    <div class="col-12">
+                        <form class="form-inline mr-auto" ng-submit="search_name()">
+                          <input class="form-control mr-sm-2 col-6" id="business-search" ng-model="search_params.term" type="text" placeholder="Search Business Name" aria-label="Search Business Name" required="required">
+                          <button class="btn btn-primary btn-rounded btn-md my-0 business-search-button" type="submit">Search</button>
+                        </form>
+                    </div>
+                    <!-- SEARCH FORM -->
+
+                    <!-- BUSINESS LIST -->
+                    <div class="col-6">
+                        <div class="row">
+                            <div class="col-12">
+                                <h4 class="text-left">Business Names</h4>
+                            </div>
+                            <div class="col-12 overflow-auto business-names-container">
+                                <!-- PER ITEM NAMES -->
+                                <section class="section-preview hoverable-fast business-names-item"
+                                    ng-repeat="business in businesses"
+                                    ng-click="fetch_reviews($event)"
+                                    data-alias="{{ business.alias }}"
+                                    data-review_count="{{ business.review_count }}">
+                                    <div class="media">
+                                      <img class="d-flex mr-3 thumb-size img-thumbnail img-fluid"
+                                            src="{{ business.image_url }}"
+                                            on-error="/images/No-image-found.jpg"
+                                            alt="{{ business.name }}">
+                                      <div class="media-body">
+                                        <h5 class="mt-0 font-weight-bold">{{ business.name }}</h5>
+                                        <p class="text-justify">{{ business.location.display_address }}</p>
+                                      </div>
+                                    </div>
+                                </section>
+                                <!-- PER ITEM NAMES END -->
+                                <!-- EMPTY DATA -->
+                                <section class="section-preview" ng-show="!businesses.length">
+                                    No business found
+                                </section>
+                                <!-- EMPTY DATA END -->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- BUSINESS LIST -->
+
+                    <!-- REVIEWS LIST -->
+                    <div class="col-6">
+                        <div class="col-12">
+                            <h4 class="text-left">Business Reviews</h4>
+                        </div>
+                        <div class="col-12 overflow-auto business-reviews-container">
+                            <section class="section-preview">
+                                <ul class="list-unstyled">
+                                <!-- PER ITEM REVIEW -->
+                                  <li class="media"
+                                    ng-repeat="business_review in business_reviews"
+                                    data-review_id="{{ business_review.id }}">
+                                    <img class="d-flex mr-3 thumb-size img-thumbnail img-fluid"
+                                        src="{{ business_review.user.image_url }}"
+                                        on-error="/images/No-image-found.jpg"
+                                        alt="{{ business_review.user.name }}">
+                                    <div class="media-body">
+                                      <h5 class="mt-0 mb-2 font-weight-bold">{{ business_review.user.name }}</h5>
+                                      <!--Review-->
+                                      <i class="fas fa-star blue-text"> </i>
+                                      <i class="fas fa-star blue-text"> </i>
+                                      <i class="fas fa-star blue-text"> </i>
+                                      <i class="fas fa-star blue-text"> </i>
+                                      <i class="fas fa-star blue-text"> </i>
+                                      <p>{{ business_review.text }}</p>
+                                    </div>
+                                  </li>
+                                <!-- PER ITEM REVIEW END -->
+                                <!-- EMPTY DATA -->
+                                  <li class="media" ng-show="!business_reviews.length">
+                                    No business reviews yet
+                                  </li>
+                                <!-- EMPTY DATA END -->
+                                </ul>
+                            </section>
+                        </div>
+                    </div>
+                    <!-- REVIEWS LIST -->
                 </div>
-                <div class="col-sm-4">
-                    <h3>
-                        Column 3
-                    </h3>
-                    <p>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit...
-                    </p>
-                    <p>
-                        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...
-                    </p>
-                </div>
+
             </div>
-        </div>
+        </main>
+        <!--Main Layout-->
+
+
+        <!-- SCRIPTS UNDERNEAThSss! -->
+        <!-- JQuery -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" type="text/javascript">
+        </script>
+        <!-- Bootstrap tooltips -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js" type="text/javascript">
+        </script>
+        <!-- Bootstrap core JavaScript -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.min.js" type="text/javascript">
+        </script>
+        <!-- MDB core JavaScript -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.18.0/js/mdb.min.js" type="text/javascript">
+        </script>
+
+        <!-- CDN ANGULARJS -->
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js"></script>
+        <!-- CUSTOM JS -->
+        <script src="/js/jq-main.js" type="text/javascript"></script>
+        <script src="/js/ang-main.js" type="text/javascript"></script>
+
     </body>
 </html>

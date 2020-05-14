@@ -32,8 +32,6 @@ def test_google_vision():
 
 def detect_faces(path = None):
     """Detects faces in an image."""
-    from google.cloud import vision
-    import io
     client = vision.ImageAnnotatorClient()
 
     # use default for now
@@ -75,7 +73,6 @@ def detect_faces_uri(uri = None):
     if uri is None:
         uri = "https://storage.googleapis.com/cloud-vision-codelab/face_surprise.jpg"
 
-    from google.cloud import vision
     client = vision.ImageAnnotatorClient()
     image = vision.types.Image()
     image.source.image_uri = uri
@@ -120,3 +117,6 @@ def load_crendential_from_file(path = None):
     )
 
     return credentials
+
+def detect_faces_uri_multple():
+    pass
