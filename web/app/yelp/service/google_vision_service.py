@@ -1,35 +1,13 @@
+# Built-ins
 import io
 import os
 
-# Imports the Google Cloud client library
+# Google Libs
 from google.oauth2 import service_account
 from google.cloud import vision
 from google.cloud.vision import enums
 from google.cloud.vision import types
 
-
-def test_google_vision():
-    # Instantiates a client
-    client = vision.ImageAnnotatorClient()
-
-    # The name of the image file to annotate
-    file_name = os.path.abspath('resources/face_surprise.jpg')
-
-    # Loads the image into memory
-    with io.open(file_name, 'rb') as image_file:
-        content = image_file.read()
-
-    image = types.Image(content=content)
-
-    # Performs label detection on the image file
-    response = client.label_detection(image=image)
-    labels = response.label_annotations
-
-    print('Labels:')
-    for label in labels:
-        print(label.description)
-
-    print()
 
 def detect_faces(path = None):
     """Detects faces in an image."""
@@ -68,6 +46,7 @@ def detect_faces(path = None):
             'https://cloud.google.com/apis/design/errors'.format(
                 response.error.message))
 
+
 def detect_faces_uri(uri = None):
     """Detects faces in the file located in Google Cloud Storage or the web."""
 
@@ -77,33 +56,7 @@ def detect_faces_uri(uri = None):
     client = vision.ImageAnnotatorClient()
     image = vision.types.Image()
     image.source.image_uri = uri
-
     response = client.face_detection(image=image)
-    faces = response.face_annotations
-
-    # Names of likelihood from google.cloud.vision.enums
-    likelihood_name = ('UNKNOWN', 'VERY_UNLIKELY', 'UNLIKELY', 'POSSIBLE',
-                       'LIKELY', 'VERY_LIKELY')
-
-    faces_emotions = []
-
-    for face in faces:
-        face_emotion = dict()
-        face_emotion['joy_likelihood'] = likelihood_name[face.joy_likelihood]
-        face_emotion['sorrow_likelihood'] = likelihood_name[face.sorrow_likelihood]
-        face_emotion['anger_likelihood'] = likelihood_name[face.anger_likelihood]
-        face_emotion['surprise_likelihood'] = likelihood_name[face.surprise_likelihood]
-        face_emotion['under_exposed_likelihood'] = likelihood_name[face.under_exposed_likelihood]
-        face_emotion['blurred_likelihood'] = likelihood_name[face.blurred_likelihood]
-        face_emotion['headwear_likelihood'] = likelihood_name[face.blurred_likelihood]
-
-        faces_emotions.append(face_emotion)
-
-        # Not deleting this might come handy next time
-        vertices = (['({},{})'.format(vertex.x, vertex.y)
-                    for vertex in face.bounding_poly.vertices])
-
-        print('face bounds: {}'.format(','.join(vertices)))
 
     if response.error.message:
         raise Exception(
@@ -111,18 +64,11 @@ def detect_faces_uri(uri = None):
             'https://cloud.google.com/apis/design/errors'.format(
                 response.error.message))
 
-    return faces_emotions
+    return parse_face_emotions(response.face_annotations)
 
-def load_crendential_from_file(path = None):
 
-    credentials = service_account.Credentials.from_service_account_file(
-        os.path.abspath(os.getenv('GOOGLE_APPLICATION_CREDENTIALS', None)),
-        scopes=["https://www.googleapis.com/auth/cloud-platform"],
-    )
-
-    return credentials
-
-def detect_faces_uri_multple(image_uris = []):
+def batch_detect_faces_uri(image_uris = []):
+    """Batch detections of faces via iamge uri"""
 
     if not image_uris:
         return []
@@ -147,26 +93,25 @@ def detect_faces_uri_multple(image_uris = []):
 
     face_index = 0
     faces_batched = []
-    for annotation_response in response.responses:
+    for _response in response.responses:
         item_date = dict()
         item_date['face_request'] = face_index
         item_date['from_url'] = image_uris[face_index]
-        item_date['faces_emotions'] = parse_face_emotions(annotation_response.face_annotations)
+        item_date['faces_emotions'] = parse_face_emotions(_response.face_annotations)
         faces_batched.append(item_date)
-        print(face_index)
         face_index += 1
-
 
     return faces_batched
 
+
 def parse_face_emotions(face_annotations):
+    """Parse google annotation reponse into readable dict format"""
 
     # Names of likelihood from google.cloud.vision.enums
     likelihood_name = ('UNKNOWN', 'VERY_UNLIKELY', 'UNLIKELY', 'POSSIBLE',
                        'LIKELY', 'VERY_LIKELY')
 
     faces_emotions = []
-
     face_index = 0
     for face in face_annotations:
         face_emotion = dict()
@@ -178,9 +123,11 @@ def parse_face_emotions(face_annotations):
         face_emotion['under_exposed_likelihood'] = likelihood_name[face.under_exposed_likelihood]
         face_emotion['blurred_likelihood'] = likelihood_name[face.blurred_likelihood]
         face_emotion['headwear_likelihood'] = likelihood_name[face.blurred_likelihood]
-
         face_index += 1
-
         faces_emotions.append(face_emotion)
+
+        # Not deleting this might come handy next time
+        vertices = (['({},{})'.format(vertex.x, vertex.y)
+                    for vertex in face.bounding_poly.vertices])
 
     return faces_emotions
