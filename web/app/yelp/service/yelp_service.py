@@ -20,6 +20,17 @@ YELP_API_BUSINESS_REVIEWS = "v3/businesses/{}/reviews"
 
 
 def business_search(term):
+    """
+    Business search
+
+    Fetch businesses names through yelp fusion api
+
+    :param      term:  The term
+    :type       term:  { string }
+
+    :returns:   { Response list }
+    :rtype:     { list }
+    """
 
     filters = dict()
     # MANILA !!
@@ -37,14 +48,23 @@ def business_search(term):
     headers = {
       'Authorization': "Bearer {}".format(yelp_credential['api_key']),
     }
-
     url = get_formated_api(YELP_API_BUSINESS_SEARCH, filters)
     response = requests.request("GET", url,headers=headers, data = payload)
-
     return response.json()
 
 
 def business_reviews(business_alias):
+    """
+    Business Reviews
+
+    Fetch business review datas from Yelp Fusion API
+
+    :param      business_alias:  The business alias
+    :type       business_alias:  { string }
+
+    :returns:   { List of reviews }
+    :rtype:     { list }
+    """
 
     yelp_credential = get_yelp_credential(
         os.path.abspath(os.getenv('YELP_CREDENTIALS', None))
@@ -54,7 +74,6 @@ def business_reviews(business_alias):
     headers = {
       'Authorization': "Bearer {}".format(yelp_credential['api_key']),
     }
-
     url = get_formated_api(YELP_API_BUSINESS_REVIEWS.format(business_alias), {})
     response = requests.request("GET", url, headers=headers, data = payload)
     response_dict = response.json()
@@ -88,6 +107,19 @@ def business_reviews(business_alias):
 
 
 def scrape_reviews_api(business_id, start = 0):
+    """
+    Scrape Reviews API
+
+    Fetch reviews data using the xhr api from the yelp web page
+
+    :param      business_id:  The business identifier
+    :type       business_id:  { string }
+    :param      start:        The start
+    :type       start:        number
+
+    :returns:   { List of reviews }
+    :rtype:     { list }
+    """
 
     payload = {}
     headers = {
@@ -146,6 +178,18 @@ def scrape_reviews_api(business_id, start = 0):
 
 
 def scrape_reviews_page(business_alias):
+    """
+    Scrape Reviews Page
+
+    Fetch reviews data through scraping the actual yelp web page
+
+    :param      business_alias:  The business alias
+    :type       business_alias:  { string }
+
+    :returns:   { List of reviews }
+    :rtype:     { list }
+    """
+
     payload = {}
     headers = {
         'X-Requested-By-React': 'true',
@@ -221,6 +265,16 @@ def split_to_quota(user_image_urls):
 
 
 def format_image_hd_link(image_url):
+    """
+    Format image string into link that point to HD image
+
+    :param      image_url:  The image url
+    :type       image_url:  { string }
+
+    :returns:   { New Image url hd link }
+    :rtype:     { string }
+    """
+
     img_basename = os.path.basename(image_url)
     if img_basename == "user_60_square.png":
         # User has no photo
@@ -233,11 +287,32 @@ def format_image_hd_link(image_url):
 
 
 def get_formated_api(api_path, query_params):
+    """
+    Gets the formated api.
+
+    :param      api_path:      The api path
+    :type       api_path:      { string }
+    :param      query_params:  The query parameters
+    :type       query_params:  { dict }
+
+    :returns:   The formated api.
+    :rtype:     { string }
+    """
+
     query_params = urlencode(query_params)
     return "{}/{}?{}".format(YELP_DOMAIN, api_path, query_params)
 
 
 def get_yelp_credential(filename):
+    """
+    Gets the yelp credential.
+
+    :param      filename:  The filename path
+    :type       filename:  { string }
+
+    :returns:   The yelp credential.
+    :rtype:     { dict }
+    """
     with open(filename) as f_in:
        return(json.load(f_in))
 

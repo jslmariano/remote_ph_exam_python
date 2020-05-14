@@ -1,16 +1,11 @@
+// Initalize mopdule
 var app = angular.module('myApp', []);
 
 
-app.config(function($locationProvider)
-{
-    $locationProvider.html5Mode(
-        {
-            enabled: true,
-            requireBase: false
-        })
-        .hashPrefix('!');
-});
-
+/**
+ Angular app dierctive for attribute on-error whereas if the src attribute fail
+ to load, then attribute src is replcaed by on-error's attribute vakue
+*/
 app.directive('onError', function()
 {
     return {
@@ -25,24 +20,33 @@ app.directive('onError', function()
     }
 })
 
-app.controller('MainController', function($scope, $http, $location, $window)
+// Initalize Controller
+app.controller('MainController', function($scope, $http, $window)
 {
+    // COMMON
     $scope.search_params = {};
     $scope.businesses = [];
     $scope.business_reviews = [];
 
-    //  MANILA!
+    // cooredinates of MANILA!
     $scope.search_params.longtitude = '14.6091';
     $scope.search_params.latitude = '121.0223';
 
+    // Statuses
     $scope.STATUS_LOADING = 1;
     $scope.STATUS_DONE = 0;
 
+    // Statuses contaners
     $scope.statuses = {}
     $scope.statuses.search = 0
     $scope.statuses.search_display = "Search"
     $scope.statuses.reviews = 0
 
+    /**
+     * Sets the search status.
+     *
+     * @param      {<int>}  status  The status
+     */
     $scope.set_search_status = function(status) {
         if (status == $scope.STATUS_LOADING) {
             $scope.statuses.search = $scope.STATUS_LOADING
@@ -54,6 +58,11 @@ app.controller('MainController', function($scope, $http, $location, $window)
         }
     }
 
+    /**
+     * Sets the reviews status.
+     *
+     * @param      {<int>}  status  The status
+     */
     $scope.set_reviews_status = function(status) {
         if (status == $scope.STATUS_LOADING) {
             $scope.statuses.reviews = $scope.STATUS_LOADING
@@ -63,6 +72,9 @@ app.controller('MainController', function($scope, $http, $location, $window)
         }
     }
 
+    /**
+     * Search and fetch business names
+     */
     $scope.search_name = function()
     {
         $scope.set_search_status(1)
@@ -86,6 +98,9 @@ app.controller('MainController', function($scope, $http, $location, $window)
             });
     }
 
+    /**
+     * Fetch business reviews
+     */
     $scope.fetch_reviews = function($event)
     {
         // Do not proceed while soul searching

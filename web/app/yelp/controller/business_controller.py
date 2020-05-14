@@ -1,6 +1,8 @@
+# Flask
 from flask import request
 from flask_restplus import Resource
 
+# Util and models
 from ..util.dto import BusinessDto
 from ..service.google_vision_service import detect_faces_uri
 from ..service.google_vision_service import batch_detect_faces_uri
@@ -9,6 +11,7 @@ from ..service.yelp_service import business_reviews
 from ..service.yelp_service import scrape_reviews_api
 from ..service.yelp_service import scrape_reviews_page
 
+# Api namespace
 api = BusinessDto.api
 _business = BusinessDto.business
 
