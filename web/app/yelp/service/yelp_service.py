@@ -40,6 +40,7 @@ def business_search(term):
     if term is not None:
         filters['term'] = str(term)
 
+    print(" Cred : {}".format(os.path.abspath(os.getenv('YELP_CREDENTIALS', None))))
     yelp_credential = get_yelp_credential(
         os.path.abspath(os.getenv('YELP_CREDENTIALS', None))
     )
