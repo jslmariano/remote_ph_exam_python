@@ -1,27 +1,5 @@
-// Initalize mopdule
-var app = angular.module('myApp', []);
-
-
-/**
- Angular app dierctive for attribute on-error whereas if the src attribute fail
- to load, then attribute src is replcaed by on-error's attribute vakue
-*/
-app.directive('onError', function()
-{
-    return {
-        restrict: 'A',
-        link: function(scope, element, attr)
-        {
-            element.on('error', function()
-            {
-                element.attr('src', attr.onError);
-            })
-        }
-    }
-})
-
 // Initalize Controller
-app.controller('MainController', function($scope, $http, $window)
+app.controller('MainController', function($scope, $http, $window, $q, request_workers)
 {
     // COMMON
     $scope.search_params = {};
@@ -45,25 +23,25 @@ app.controller('MainController', function($scope, $http, $window)
     /**
      * Creates a toast option.
      */
-    $scope.create_toast_option = function() {
-        toastr.options = {
-          "closeButton": true,
-          "debug": false,
-          "newestOnTop": false,
-          "progressBar": false,
-          "positionClass": "toast-bottom-right",
-          "preventDuplicates": false,
-          "onclick": null,
-          "showDuration": "300",
-          "hideDuration": "1000",
-          "timeOut": "5000",
-          "extendedTimeOut": "1000",
-          "showEasing": "swing",
-          "hideEasing": "linear",
-          "showMethod": "fadeIn",
-          "hideMethod": "fadeOut"
-        }
-    }
+    // $scope.create_toast_option = function() {
+    //     toastr.options = {
+    //       "closeButton": true,
+    //       "debug": false,
+    //       "newestOnTop": false,
+    //       "progressBar": false,
+    //       "positionClass": "toast-bottom-right",
+    //       "preventDuplicates": false,
+    //       "onclick": null,
+    //       "showDuration": "300",
+    //       "hideDuration": "1000",
+    //       "timeOut": "5000",
+    //       "extendedTimeOut": "1000",
+    //       "showEasing": "swing",
+    //       "hideEasing": "linear",
+    //       "showMethod": "fadeIn",
+    //       "hideMethod": "fadeOut"
+    //     }
+    // }
 
     /**
      * Shows the warning.
@@ -141,6 +119,13 @@ app.controller('MainController', function($scope, $http, $window)
     }
 
     /**
+     * Initializes the request workers.
+     */
+    $scope.init_request_workers = function() {
+        $scope.request_workers = request_workers;
+    };
+
+    /**
      * Fetch business reviews
      */
     $scope.fetch_reviews = function($event)
@@ -179,25 +164,28 @@ app.controller('MainController', function($scope, $http, $window)
             }
         }
 
+        // Init request workers
+        $scope.init_request_workers();
+        // Cancel any old request
+        $scope.request_workers.cancel_request('fetch_reviews');
         $scope.set_reviews_status(1);
-        $http(
-            {
-                method: "GET",
-                url: mode_api,
-                params: business_datas
-            })
-            .then(function success(response)
-            {
-                console.log(response);
+        // Create new requests
+        request_fetch_reviews = $scope.request_workers.create_request('fetch_reviews', mode_api, business_datas);
+        request_fetch_reviews.promise.then(
+            function(response){
+                console.log("finished", response);
                 $scope.business_reviews = response.data.business_reviews.reviews;
                 $scope.set_reviews_status(0);
-            }, function error(response)
-            {
-                console.log(response);
-                $scope.business_reviews = [];
-                $scope.set_reviews_status(0);
-                $scope.show_error("Something gone wrong can you please try again?")
-            });
+            },
+            function(reason){
+                console.log("abort", reason);
+            }
+        ).catch(function(response){
+            console.log("catch", response);
+            $scope.set_reviews_status(0);
+            $scope.show_error("Something gone wrong can you please try again?")
+        });
+
     }
 
     /**
