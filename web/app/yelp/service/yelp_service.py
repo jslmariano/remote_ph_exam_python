@@ -17,6 +17,7 @@ from ..service.google_vision_service import batch_detect_faces_uri
 # Redis cache
 from app.redis.service.redis_cache_service import RedisCache
 
+REDIS_CACHE_SECONDS = 60
 
 # YELP FUSION APIS
 YELP_DOMAIN = "https://api.yelp.com"
@@ -68,7 +69,7 @@ def business_search(term):
 
     # Save return data to cache
     return_data = response.json()
-    redis_cache.save_cache(cache_key, return_data, 20)
+    redis_cache.save_cache(cache_key, return_data, REDIS_CACHE_SECONDS)
     return return_data
 
 def business_reviews(business_alias):
@@ -281,7 +282,7 @@ def scrape_reviews_page(business_alias):
 
     # Save return data to cache
     return_data = {'reviews' : review_lists, 'review_lists' : user_image_urls}
-    redis_cache.save_cache(cache_key, return_data, 20)
+    redis_cache.save_cache(cache_key, return_data, REDIS_CACHE_SECONDS)
     return return_data
 
 
