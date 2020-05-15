@@ -196,7 +196,7 @@ def scrape_reviews_page(business_alias):
 
     # Manual redis caching
     # TODO: If possible to convert to decorator
-    cache_key = 'reviews:001:reviews.data'
+    cache_key = "reviews:001:reviews.data.{}".format(business_alias)
     redis_cache = RedisCache()
     cached_data = redis_cache.get_cache(cache_key)
     # Return cached data
