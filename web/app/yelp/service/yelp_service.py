@@ -44,6 +44,16 @@ def business_search(term):
     if term is not None:
         filters['term'] = str(term)
 
+    # Manual redis caching
+    # TODO: If possible to convert to decorator
+    cache_key = "business:001:business.data.{}".format(str(term))
+    redis_cache = RedisCache()
+    cached_data = redis_cache.get_cache(cache_key)
+    # Return cached data
+    if cached_data is not None:
+        return cached_data
+
+
     yelp_credential = get_yelp_credential(
         os.path.abspath(os.getenv('YELP_CREDENTIALS', None))
     )
@@ -54,8 +64,12 @@ def business_search(term):
     }
     url = get_formated_api(YELP_API_BUSINESS_SEARCH, filters)
     response = requests.request("GET", url,headers=headers, data = payload)
-    return response.json()
 
+
+    # Save return data to cache
+    return_data = response.json()
+    redis_cache.save_cache(cache_key, return_data, 20)
+    return return_data
 
 def business_reviews(business_alias):
     """
@@ -196,7 +210,7 @@ def scrape_reviews_page(business_alias):
 
     # Manual redis caching
     # TODO: If possible to convert to decorator
-    cache_key = "reviews:001:reviews.data.{}".format(business_alias)
+    cache_key = "business:001:reviews.data.{}".format(business_alias)
     redis_cache = RedisCache()
     cached_data = redis_cache.get_cache(cache_key)
     # Return cached data
