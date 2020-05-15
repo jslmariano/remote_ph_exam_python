@@ -2,7 +2,11 @@
 
 ## Overview
 
-A modular restful api made from flask restplus, and already docker containerized.
+A modular restful api made from flask restplus, and already docker containerized. This is just a working demo between yelp and google vision api
+
+Searches somehow locked to MANILA coordinates but may return other addresses depending on YELP API, Use the search box to populate the business names. Then choose from business names on the left side panel to show the reviews with the emotion tags related to **"joyLikelihood"** and **"sorrowLikelihood"** per review
+
+Check it out here: https://app.jslmariano.com/
 
 Requirements:
 
@@ -14,22 +18,46 @@ Requirements:
 
 - Please see .env file for database configuration
 - No need to import dummy database it wll be handled by `docker-compose`
-- *Email* setup is for local only and not for production please see console logs for email confirmations.
-- - If you bring up your docker in background please use `docker-compose logs` to peek on console
+- If you bring up your docker in background please use `docker-compose logs` to peek on console
 
 
 ## Local Dev Instructions
 
 1. Install docker from this tutorial https://docs.docker.com/install/ and https://docs.docker.com/compose/install/
-1. Extract the files on your workspace - `/<path_to_workspace>/remote_ph_exam_python`
-1. Go to your project directory - `/<path_to_workspace>/remote_ph_exam_python`
+1. Extract the files on your workspace - `/<path_to_workspace>/yelp_twist`
+1. Go to your project directory - `/<path_to_workspace>/yelp_twist`
 1. Build images - `docker-compose build` (This may take a while for 1st time, go grab your coffee :) )
 1. Start services - `docker-compose up`
 1. Browse your applciation on - `localhost`
-1. Always run migration for new tables ` docker exec -it remote-ph-app /usr/local/bin/python manage.py db migrate`
-1. Test scripts are available, `docker exec -it remote-ph-app /usr/local/bin/python manage.py test`
+1. (OPTIONAL) Run migration for new tables ` docker exec -it jsl-app /usr/local/bin/python manage.py db migrate`
+1. (OPTIONAL) Test scripts are available, `docker exec -it jsl-app /usr/local/bin/python manage.py test`
 
-## Restful API
+## Google Cloud Vision API
+1. You need to understand the api here https://cloud.google.com/vision/docs
+2. There is a lot of working example there using multiple programming languages
+3. If you on local you need a Google Service Account json KEY file
+4. And set it up like this https://serverfault.com/questions/848580/how-to-use-google-application-credentials-with-gcloud-on-a-server 
+
+## YELP API DEMO
+
+1. For the yelp endpoint api to work on your local you need to create your **API KEY** here : https://www.yelp.com/developers/v3/manage_app
+2. Save the file to `web/credential_keys/yelp_api_key.json` with proper json format of 
+```
+{
+    "app_name": "<App Name>",
+    "contact_email": "<Email used in yelp>",
+    "client_id": "<Client ID>",
+    "api_key": "<API Key>"
+}
+```
+3. Edit your docker environment `docker_compose/app/.env` add `YELP_CREDENTIALS=credential_keys/yelp_api_key.json`
+4. Go back to your client window and check docker config using `docker-compose config` 
+5. check if your `YELP_CREDENTIALS` in there
+
+## Restful API DEMO
+
+If lazy to setup POSTMAN just go to `/api/v1` and swagger ui will help you out :)
+
 1. Go to https://documenter.getpostman.com/view/6907051/Szmh2wHN?version=latest and Click "Run in postman"
 1. If your postman opens choose "Flask Modular RestPlus | Local" as environment to your top right corner
 1. If the 2 above does not work, proceed below to the manual
@@ -91,5 +119,5 @@ with body
 If you want to contribute to this flask modular restplus, clone the repository and just start making pull requests.
 
 ```
-https://github.com/jslmariano/remote_ph_exam_python.git
+https://github.com/jslmariano/yelp_twist.git
 ```

@@ -43,6 +43,47 @@ app.controller('MainController', function($scope, $http, $window)
     $scope.statuses.reviews = 0
 
     /**
+     * Creates a toast option.
+     */
+    $scope.create_toast_option = function() {
+        toastr.options = {
+          "closeButton": true,
+          "debug": false,
+          "newestOnTop": false,
+          "progressBar": false,
+          "positionClass": "toast-bottom-right",
+          "preventDuplicates": false,
+          "onclick": null,
+          "showDuration": "300",
+          "hideDuration": "1000",
+          "timeOut": "5000",
+          "extendedTimeOut": "1000",
+          "showEasing": "swing",
+          "hideEasing": "linear",
+          "showMethod": "fadeIn",
+          "hideMethod": "fadeOut"
+        }
+    }
+
+    /**
+     * Shows the warning.
+     *
+     * @param      {<string>}  message  The message
+     */
+    $scope.show_warning = function(message) {
+        toastr["warning"](message, "Mehhh...")
+    }
+
+    /**
+     * Shows the error.
+     *
+     * @param      {<string>}  message  The message
+     */
+    $scope.show_error = function(message) {
+        toastr["error"](message, "Oh My!")
+    }
+
+    /**
      * Sets the search status.
      *
      * @param      {<int>}  status  The status
@@ -95,6 +136,7 @@ app.controller('MainController', function($scope, $http, $window)
                 console.log(response);
                 $scope.businesses = [];
                 $scope.set_search_status(0)
+                $scope.show_error("Something gone wrong can you please try again?")
             });
     }
 
@@ -103,6 +145,9 @@ app.controller('MainController', function($scope, $http, $window)
      */
     $scope.fetch_reviews = function($event)
     {
+        // Clear reviews
+        $scope.business_reviews = [];
+
         // Do not proceed while soul searching
         if ($scope.statuses.search == $scope.STATUS_LOADING) {
             return false;
@@ -112,7 +157,6 @@ app.controller('MainController', function($scope, $http, $window)
         review_count = $event.currentTarget.dataset.review_count
         if (parseInt(review_count) <= 0)
         {
-            $scope.business_reviews = [];
             return false;
         }
 
@@ -138,7 +182,6 @@ app.controller('MainController', function($scope, $http, $window)
         $scope.set_reviews_status(1);
         $http(
             {
-                // http://localhost/api/v1/yelp/business/reviews?alias=spiral-pasay-2
                 method: "GET",
                 url: mode_api,
                 params: business_datas
@@ -153,6 +196,7 @@ app.controller('MainController', function($scope, $http, $window)
                 console.log(response);
                 $scope.business_reviews = [];
                 $scope.set_reviews_status(0);
+                $scope.show_error("Something gone wrong can you please try again?")
             });
     }
 
