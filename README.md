@@ -7,6 +7,7 @@ A modular restful api made from flask restplus, and already docker containerized
 Searches somehow locked to MANILA coordinates but may return other addresses depending on YELP API, Use the search box to populate the business names. Then choose from business names on the left side panel to show the reviews with the emotion tags related to **"joyLikelihood"** and **"sorrowLikelihood"** per review
 
 Check it out here: https://app.jslmariano.com/
+NOTE: This link is down for now due to charges, if you want a demo please email me at jslmariano@gmail.com :)
 
 Requirements:
 
