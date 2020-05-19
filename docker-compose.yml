@@ -24,26 +24,6 @@ services:
     networks:
       - jsl-network
 
-  # vue_ui:
-  #   build:
-  #     context: ./vue_ui
-  #     dockerfile: ../docker_compose/vue_ui/Dockerfile
-  #   image: jsl-vue_ui
-  #   container_name:  jsl-vue_ui
-  #   restart: unless-stopped
-  #   tty: true
-  #   ports:
-  #       - "8000:8000"
-  #       - "5000:5000"
-  #   stdin_open: true
-  #   #  mount the volumes so we can change code and hot reload
-  #   # volumes:
-  #   #     - './vue_ui:/vue_ui'
-  #   #  port allows the host machine to link to container
-  #   #  8000 for vue ui, 5000 for our vue app
-  #   networks:
-  #     - jsl-network
-
   nginx:
     build:
       context: ./nginx
@@ -59,9 +39,6 @@ services:
       - ./docker_compose/nginx/conf.d/:/etc/nginx/conf.d/
     env_file:
       - ./docker_compose/nginx/.env
-    environment:
-      SERVICE_NAME: mongodb
-      SERVICE_TAGS: dev
     networks:
       - jsl-network
 

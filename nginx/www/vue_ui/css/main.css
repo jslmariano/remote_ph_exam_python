@@ -1,0 +1,42 @@
+ul.order-pagination {
+    margin-left: auto;
+    margin-right: auto;
+    display: inline-flex;
+}
+
+form.goto {
+    display: inline-flex;
+    margin: auto;
+}
+
+form.goto input {
+    max-width: 65px;
+}
+
+footer {
+    margin-top: 10px;
+}
+
+select.limit {
+    max-width: 100px;
+    display: inline-flex !important;
+}
+
+.search-box {
+    margin-bottom: 15px;
+}
+
+.total-amount {
+    font-weight: bold;
+}
+
+/* On screens that are 767px or less, set the background color to blue */
+@media screen and (max-width: 767px) {
+    .limit-container {
+        text-align: center!important;
+        margin-bottom: 10px;
+    }
+    .goto-container {
+        text-align: center!important;
+    }
+}

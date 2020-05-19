@@ -1,21 +1,27 @@
 FROM node:lts-alpine
 
-# install project dependencies
-RUN npm install -g @vue/cli
-
-# set working directory
+# make the 'app' folder the current working directory
 WORKDIR /vue_ui
-RUN ls -al
-# # copy project files and folders to the current working directory (i.e. 'app' folder)
-COPY . .
-RUN ls -al
 
-# # add `/vue_ui/node_modules/.bin` to $PATH
+ADD . .
+
+# add `/vue_ui/node_modules/.bin` to $PATH
 ENV PATH /vue_ui/node_modules/.bin:$PATH
 
+# # install simple http server for serving static content
+# RUN npm install -g http-server
+
+# # copy both 'package.json' and 'package-lock.json' (if available)
+# COPY package*.json ./
+
+# install project dependencies
 RUN npm install
 
+# # copy project files and folders to the current working directory (i.e. 'app' folder)
+# COPY . .
 
+# # build app for production with minification
+# RUN npm run build
 
-# vue ui --headless --port 8000 --host 0.0.0.0
-CMD [ "vue", "ui", "--headless" , "--port", "8000",  "--host", "0.0.0.0" ]
+# EXPOSE 8000
+# CMD [ "http-server", "-p  8050", "dist" ]
