@@ -6,6 +6,8 @@ from sqlalchemy import sql, select, func, or_
 from app.main import db
 from ..service.abstract_service import AbstractService
 from app.orders.model.orders import Orders, OrderItems, OrderDeliveries
+from app.customers.model.customer import Customers
+from app.customers.model.company import Companies
 
 class OrderService(AbstractService):
     """docstring for OrderService"""
@@ -29,8 +31,6 @@ class OrderService(AbstractService):
         # Placeholder for missing columns for now
         _columns.append(Orders.id.label('customer_name'))
         _columns.append(Orders.id.label('customer_company'))
-        _columns.append(Orders.id.label('delivered_amount'))
-        _columns.append(Orders.id.label('total_amount'))
         return _columns
 
     def prepare_collection(self, term = None, start_date = None, end_date = None):
@@ -43,7 +43,6 @@ class OrderService(AbstractService):
 
         _query  = self.createQuery(Orders)
         _query = _query.join(OrderItems, OrderItems.order_id == Orders.id)
-        pprint.pprint(_query)
 
         if self.filters.get('start_date', None):
             _query = _query.filter(Orders.created_at  >= self.filters['start_date'])
@@ -96,6 +95,12 @@ class OrderService(AbstractService):
         self.setCurrentQuery(_query)
         orders = self.result2list(_query)
 
+        customers_ids = [r[0] for r in self.getCurrentIDS(Orders.customer_id)]
+        customers = self.get_customers(customers_ids)
+
+        company_ids = [customer['company_id'] for r, customer in customers.items()]
+        companies = self.get_companies(company_ids)
+
         order_item_service = OrderItemService()
         order_items = order_item_service.get_order_items_additional(order_collection['order_ids'])
         grand_totals = list()
@@ -103,6 +108,9 @@ class OrderService(AbstractService):
         # map additional totals to orders
         for x, order in enumerate(orders):
             _id = order['id']
+            company_id  = customers[orders[x]['customer_id']]['company_id']
+            orders[x]['customer_name'] = customers[orders[x]['customer_id']]['name']
+            orders[x]['customer_company'] = companies[company_id]['company_name']
             if _id in order_items['items'].keys():
                 _total_amount = order_items['items'][_id]['total_amount'] or 0
                 _delivered_amount = order_items['items'][_id]['delivered_amount'] or 0
@@ -122,6 +130,28 @@ class OrderService(AbstractService):
             result['items'] = str(e)
             db.session.rollback()
         return result
+
+    def get_customers(self, user_ids=[]):
+        customers = Customers.find_by_user_ids(user_ids)
+        customers_dicts = dict()
+        for customer in customers:
+            customers_dicts[customer.user_id] = dict(
+                user_id=customer.user_id,
+                name=customer.name,
+                company_id=customer.company_id,
+            )
+        return customers_dicts
+
+    def get_companies(self, company_ids=[]):
+        companies = Companies.find_by_company_ids(company_ids)
+        companies_dicts = dict()
+        for company in companies:
+            companies_dicts[company.company_id] = dict(
+                company_id=company.company_id,
+                company_name=company.company_name,
+            )
+        return companies_dicts
+
 
 
 class OrderItemService(AbstractService):
@@ -206,9 +236,3 @@ class OrderItemService(AbstractService):
             result['items'] = str(e)
             db.session.rollback()
         return result
-
-class OrderDeliveryService(AbstractService):
-    """docstring for OrderDeliveryService"""
-    def __init__(self):
-        super(OrderDeliveryService, self).__init__()
-        self.session = db.session

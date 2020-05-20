@@ -12,3 +12,8 @@ class Customers(mongo.Document):
 
     def __repr__(self):
         return '<Customers(name={self.name!r})>'.format(self=self)
+
+    def find_by_user_ids(user_ids=[]):
+        if user_ids:
+            return Customers.objects(user_id__in=user_ids)
+        return Customers.objects()

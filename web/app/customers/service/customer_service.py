@@ -4,10 +4,10 @@ import pprint
 from app.customers.model.customer import Customers
 from app.main import mongo
 
-def get_all_customers():
+def get_all_customers(user_ids = []):
 
     customer_list = []
-    for customer in Customers.objects:
+    for customer in Customers.find_by_user_ids(user_ids):
         customer_dict = dict()
         customer_dict['user_id'] = customer.user_id
         customer_dict['login'] = customer.login

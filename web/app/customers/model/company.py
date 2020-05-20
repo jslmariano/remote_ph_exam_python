@@ -9,3 +9,8 @@ class Companies(mongo.Document):
 
     def __repr__(self):
         return '<Companies(company_name={self.company_name!r})>'.format(self=self)
+
+    def find_by_company_ids(company_ids=[]):
+        if company_ids:
+            return Companies.objects(company_id__in=company_ids)
+        return Companies.objects()
