@@ -76,6 +76,14 @@ OrderModel.methods.on_goto = function(event, page) {
     this.on_page(event, page);
 }
 
+OrderModel.methods.on_page_limit = function(event, page) {
+    if (page > this.pagination.totalPages) {
+        page = this.pagination.totalPages;
+    }
+    this.params.page = page;
+    this.on_page(event, page);
+}
+
 OrderModel.methods.get_url_params = function() {
     _params = {}
     for (var key of Object.keys(this.params)) {

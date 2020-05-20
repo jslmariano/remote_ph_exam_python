@@ -140,7 +140,7 @@
                         <div class="row">
                             <div class="col-md-6 text-right limit-container">
                                 <select class="browser-default custom-select custom-select-sm limit"
-                                  @change="on_page($event, params.page)"
+                                  @change="on_page_limit($event, 1)"
                                   v-model="params.limit">
                                   <option value="5" selected>5/page</option>
                                   <option value="10">10/page</option>
