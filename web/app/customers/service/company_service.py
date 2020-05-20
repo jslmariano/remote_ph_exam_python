@@ -1,7 +1,7 @@
 import csv
 import pprint
 
-from app.customers.model.customer import Companies
+from app.customers.model.company import Companies
 from app.main import mongo
 
 def get_all_companies():

@@ -45,7 +45,9 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="md-form">
-                          <input placeholder="Order Name or Product Name" type="text" id="search-box" class="form-control search-box" v-model="params.term">
+                          <input placeholder="Order Name or Product Name" type="text" id="search-box" class="form-control search-box"
+                          v-model="params.term"
+                          @keyup.enter="on_page($event, 1)" />
                           <label for="search-box">Search</label>
                         </div>
                     </div>
@@ -112,8 +114,8 @@
                                   <td>{{ order.customer_company }}</td>
                                   <td>{{ order.customer_name }}</td>
                                   <td>{{ order.order_date }}</td>
-                                  <td>$ {{ order.delivered_amount }}</td>
-                                  <td>$ {{ order.total_amount }}</td>
+                                  <td class="order-delivered-amount text-right">$ {{ order.delivered_amount }}</td>
+                                  <td class="order-total-amount text-right">$ {{ order.total_amount }}</td>
                                 </tr>
                               </tbody>
                             </table>
@@ -122,7 +124,7 @@
                 </div>
                 <div class="row d-flex">
                     <div class="col-md-12 text-left">
-                        <span class="total-count">Total {{ pagination.totalPages }}</span>
+                        <span class="total-count">Total {{ params.total_items }}</span>
                     </div>
                 </div>
                 <!-- ORDER TABLE -->
@@ -155,7 +157,8 @@
                                     <input class="form-control form-control-sm mx-sm-2" id="goto"
                                         aria-describedby="passwordHelpInline"
                                         type="number" min="1" value="1"
-                                        @blur="on_page($event, params.page)"
+                                        v-bind:max="pagination.totalPages"
+                                        @blur="on_goto($event, params.page)"
                                         v-model="params.page"
                                         />
                                   </div>

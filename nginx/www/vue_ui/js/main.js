@@ -10,7 +10,7 @@ OrderModel.el = '#app';
 OrderModel.data = function() {
     return {
         orders: [],
-        api_orders: '/api/v1/customer/test',
+        api_orders: '/api/v1/customer/orders',
         order_pagination_instance: null,
         total_amount: 198.23,
         pagination: {
@@ -33,7 +33,8 @@ OrderModel.data = function() {
             limit: 5,
             start_date: null,
             end_date: null,
-            term: 'asdas asd'
+            term: null,
+            total_items: 0
         }
     };
 }
@@ -53,16 +54,26 @@ OrderModel.methods.get_orders = function () {
             this.pagination.totalPages = Math.ceil(
                 parseInt(data.total_count) / parseInt(this.params.limit)
             );
+            this.params.total_items = data.total_count;
             this.update_pagination();
         })
         .catch((err) => {
             throw err;
+            this.params.total_items = 0;
         })
 }
 
 OrderModel.methods.on_page = function(event, page) {
     this.params.page = page;
     this.get_orders();
+}
+
+OrderModel.methods.on_goto = function(event, page) {
+    if (page > this.pagination.totalPages) {
+        page = this.pagination.totalPages;
+    }
+    this.params.page = page;
+    this.on_page(event, page);
 }
 
 OrderModel.methods.get_url_params = function() {
@@ -77,6 +88,13 @@ OrderModel.methods.get_url_params = function() {
 
 OrderModel.methods.init_pagination = function() {
     this.$pagination_el = jQuery('.order-pagination');
+
+
+    totalPages = this.pagination.totalPages;
+    if (!totalPages) {
+        this.pagination.totalPages = 1;
+    }
+
     this.order_pagination_instance = this.$pagination_el.twbsPagination(
         this.pagination
     );
@@ -86,6 +104,13 @@ OrderModel.methods.update_pagination = function() {
     if (!this.$pagination_el) {
         this.init_pagination();
     }
+
+    console.log(this.pagination.totalPages);
+    totalPages = this.pagination.totalPages;
+    if (!totalPages) {
+        this.pagination.totalPages = 1;
+    }
+
     this.$pagination_el.twbsPagination('destroy');
     this.$pagination_el.twbsPagination(jQuery.extend({}, this.pagination));
 }
@@ -118,7 +143,6 @@ OrderModel.methods.init_datepicker = function() {
     this.from_picker.on('set', function (event) {
         if (event.select) {
             self.to_picker.set('min', self.from_picker.get('select'))
-
             self.params.start_date = self.get_date_format(
                 this.component.item.highlight.obj, self.datepicker_from.format
             )
@@ -127,6 +151,7 @@ OrderModel.methods.init_datepicker = function() {
             self.to_picker.set('min', false)
             self.params.start_date = null;
         }
+        self.on_page(event, 1);
     })
     this.to_picker.on('set', function (event) {
         if (event.select) {
@@ -139,6 +164,7 @@ OrderModel.methods.init_datepicker = function() {
             self.from_picker.set('max', false)
             self.params.end_date = null;
         }
+        self.on_page(event, 1);
     })
 }
 

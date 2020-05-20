@@ -5,6 +5,8 @@ from flask_restplus import Resource
 
 from ..util.dto import CustomerDto
 from ..service.customer_service import *
+from ..service.company_service import *
+from app.orders.service.orders_service import OrderService
 
 api = CustomerDto.api
 _customer = CustomerDto.customer
@@ -41,6 +43,38 @@ class CustomerCsv(Resource):
     def get(self):
         """List all registered users"""
         return save_customers_from_csv()
+
+
+
+@api.route('/orders')
+class CustomerOrders(Resource):
+
+    @api.doc('list_of_customer_orders')
+    def get(self):
+        """List all customer orders"""
+
+
+        _limit = int(request.args.get('limit', 5))
+        _page = int(request.args.get('page', 1))
+        _term = request.args.get('term', None)
+        _start_date = request.args.get('start_date', None)
+        _end_date = request.args.get('end_date', None)
+
+        # Filter null from javascript
+        if _start_date == "null":
+            _start_date = None
+        if _end_date == "null":
+            _end_date = None
+
+        order_service = OrderService()
+        order_service.page_size = _limit
+        order_service.page = _page
+
+        results = order_service.get_orders(_term, _start_date, _end_date)
+        results['page'] = _page
+        results['limit'] = _limit
+
+        return results
 
 
 @api.route('/test')
