@@ -1,0 +1,29 @@
+.documentation .section-preview {
+    border: 1px solid #e0e0e0;
+    padding: 15px;
+}
+.documentation .section-preview.active {
+    border: 3px solid #e0e0e0;
+    padding: 15px;
+    background-color: antiquewhite;
+}
+.section-preview {
+    margin-bottom: 10px;
+}
+.business-names-container, .business-reviews-container {
+    max-height: 400px;
+}
+.thumb-size {
+    max-width: 90px;
+}
+.business-names-container .business-names-item {
+    cursor: pointer;
+}
+.hoverable-fast {
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+.hoverable-fast:hover {
+    -webkit-box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}

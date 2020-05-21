@@ -18,23 +18,30 @@ class DevelopmentConfig(Config):
     ENV = 'development'
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'flask_boilerplate_main.db')
+    SQLALCHEMY_DATABASE_URI = 'postgresql://{0}:{1}@{2}:{3}/{4}'.format(
+        os.getenv('POSTGRES_DB_USER', None),
+        os.getenv('POSTGRES_DB_PASS', None),
+        os.getenv('POSTGRES_DB_SERVICE', None),
+        os.getenv('POSTGRES_DB_PORT', None),
+        os.getenv('POSTGRES_DB_NAME', None),
+    )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     BASIC_AUTH_USERNAME = 'sample'
     BASIC_AUTH_PASSWORD = 'pass'
     BASIC_AUTH_REALM = 'Basic Auth Required'
-    MONGODB_USERNAME = os.environ['MONGODB_USERNAME']
-    MONGODB_PASSWORD = os.environ['MONGODB_PASSWORD']
-    MONGODB_HOSTNAME = os.environ['MONGODB_HOSTNAME']
-    MONGODB_DATABASE = os.environ['MONGODB_DATABASE']
+    MONGODB_USERNAME = os.getenv('MONGODB_USERNAME', None)
+    MONGODB_PASSWORD = os.getenv('MONGODB_PASSWORD', None)
+    MONGODB_HOSTNAME = os.getenv('MONGODB_HOSTNAME', None)
+    MONGODB_DATABASE = os.getenv('MONGODB_DATABASE', None)
     MONGO_URI = ('mongodb://' + MONGODB_USERNAME + ':' +
                 MONGODB_PASSWORD + '@' + MONGODB_HOSTNAME + ':27017/' +
                 MONGODB_DATABASE + '?authSource=admin')
     MONGODB_SETTINGS = {
-        'db' : os.environ['MONGODB_DATABASE'],
-        'host'  : ('mongodb://' + os.environ['MONGODB_USERNAME'] + ':' +
-                    os.environ['MONGODB_PASSWORD'] + '@' +
-                    os.environ['MONGODB_HOSTNAME'] + ':27017/' +
-                    os.environ['MONGODB_DATABASE'] + '?authSource=admin'),
+        'db' : os.getenv('MONGODB_DATABASE', None),
+        'host'  : ('mongodb://' + os.getenv('MONGODB_USERNAME', None) + ':' +
+                    os.getenv('MONGODB_PASSWORD', None) + '@' +
+                    os.getenv('MONGODB_HOSTNAME', None) + ':27017/' +
+                    os.getenv('MONGODB_DATABASE', None) + '?authSource=admin'),
     }
 
 
