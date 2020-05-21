@@ -44,7 +44,7 @@ cd app/
     5. Make sure you have network `ping google.com`
     6. Directory is not writable? You can use your home directory inside your virtualbox, see step 3
 5. Start services - `docker-compose up -d --build`
-6. Browse your application on - `http://localhost/order/`
+6. Browse your application on - `http://localhost/orders/`
 7. Check you containers if all is running `docker ps -a`
 ```
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                      NAMES

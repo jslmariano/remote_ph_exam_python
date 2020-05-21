@@ -87,6 +87,7 @@ class OrderService(AbstractService):
         self.setCurrentQuery(_query)
         result = dict()
         result['query'] = self.showQuery(_query, True)
+        pprint.pprint(result['query'])
         result['order_ids'] = [r[0] for r in self.getCurrentIDS(Orders.id)]
         result['total_count'] = self.getCurrentCount(Orders.id)
         return result

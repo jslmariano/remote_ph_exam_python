@@ -65,6 +65,8 @@ class CustomerOrders(Resource):
             _start_date = None
         if _end_date == "null":
             _end_date = None
+        if _term == "null":
+            _term = None
 
         order_service = OrderService()
         order_service.page_size = _limit
