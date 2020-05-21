@@ -4,6 +4,16 @@
 
 This is just a series of applications produced from fun experiments
 
+**TECHNOLOGIES USED**:
+- Docker
+- Flask Python Framework
+- PHP
+- HTML, CSS, Javascript, Jquery
+- VueJS
+- AngularJS
+- PostgreSQL
+- MongoDB
+- Redis
 
 Check it out here: https://app.jslmariano.com/
 
