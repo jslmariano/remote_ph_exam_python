@@ -24,6 +24,8 @@ def save_company(company_id, company_name):
     return []
 
 def save_company_from_csv():
+    print("Clearing out mongodb [companies]")
+    delete_all_companies()
     input_file = csv.DictReader(
         open("csv_test_datas/Test task - Mongo - customer_companies.csv")
     )
@@ -34,6 +36,7 @@ def save_company_from_csv():
         inserted_count += 1
 
     message = "New {} companies".format(inserted_count)
+    print("Done loading csv to mongodb [companies]")
     return {'message' : message}
 
 def delete_all_companies():

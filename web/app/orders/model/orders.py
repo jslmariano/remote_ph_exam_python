@@ -27,10 +27,10 @@ class OrderItems(db.Model):
     __tablename__ = 'order_items'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    order_id = db.Column(db.Integer)
-    price_per_unit = db.Column(db.Float)
-    quantity = db.Column(db.Integer)
-    product = db.Column(db.String(500))
+    order_id = db.Column(db.Integer, default=0, nullable=True)
+    price_per_unit = db.Column(db.Float, default=0.00, nullable=True)
+    quantity = db.Column(db.Integer, default=0, nullable=True)
+    product = db.Column(db.String(500), default='', nullable=True)
 
     def __repr__(self):
         return '<id: product: {}'.format(self.product)
@@ -43,5 +43,5 @@ class OrderDeliveries(db.Model):
     __tablename__ = 'order_deliveries'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    order_item_id = db.Column(db.Integer)
-    delivered_quantity = db.Column(db.Integer)
+    order_item_id = db.Column(db.Integer, default=0, nullable=True)
+    delivered_quantity = db.Column(db.Integer, default=0, nullable=True)

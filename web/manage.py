@@ -25,6 +25,35 @@ manager.add_command('db', MigrateCommand)
 def run():
     app.run()
 
+@manager.command
+def load_csv():
+    """
+    This will load data from custom csv files to postgres and mongodb
+
+    Files Should be :
+        - web/csv_test_datas/Test task - Mongo - customer_companies.csv
+        - web/csv_test_datas/Test task - Mongo - customers.csv
+        - web/csv_test_datas/Test task - Postgres - deliveries.csv
+        - web/csv_test_datas/Test task - Postgres - order_items.csv
+        - web/csv_test_datas/Test task - Postgres - orders.csv
+    """
+    from app.customers.service.customer_service import save_customers_from_csv
+    from app.customers.service.company_service import save_company_from_csv
+
+    from app.orders.service.orders_service import OrderItemService
+    from app.orders.service.orders_service import OrderService
+    from app.orders.service.orders_service import OrderDeliveriesService
+
+    # STart process
+    print("Trying to load CSV to MongoDB")
+    save_customers_from_csv()
+    save_company_from_csv()
+    print("Done loading csv to MongoDB")
+    print("Trying to load CSV to PostgreSQL")
+    OrderService().load_from_csv()
+    OrderItemService().load_from_csv()
+    OrderDeliveriesService().load_from_csv()
+    print("Done loading csv to PostgreSQL")
 
 @manager.command
 def test():

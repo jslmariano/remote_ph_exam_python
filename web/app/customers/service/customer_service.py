@@ -31,6 +31,9 @@ def save_customer(user_id, login, password,
     return []
 
 def save_customers_from_csv():
+    print("Clearing out mongodb [customers]")
+    delete_all_customer()
+
     input_file = csv.DictReader(
         open("csv_test_datas/Test task - Mongo - customers.csv")
     )
@@ -41,6 +44,7 @@ def save_customers_from_csv():
         inserted_count += 1
 
     message = "New {} customers".format(inserted_count)
+    print("Done loading csv to mongodb [customers]")
     return {'message' : message}
 
 def delete_all_customer():

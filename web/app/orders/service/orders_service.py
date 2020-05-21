@@ -9,6 +9,16 @@ from app.orders.model.orders import Orders, OrderItems, OrderDeliveries
 from app.customers.model.customer import Customers
 from app.customers.model.company import Companies
 
+
+def split_to_max(_records, max_per_record):
+
+    # AVOIDING grpc_message : "Too many per request" error WORKAROUND
+    # Break records into per N parts.,
+
+    # using list comprehension
+    return [_records[i:i + max_per_record] for i in range(0, len(_records), max_per_record)]
+
+
 class OrderService(AbstractService):
     """docstring for OrderService"""
 
@@ -152,6 +162,57 @@ class OrderService(AbstractService):
             )
         return companies_dicts
 
+    def load_from_csv(self):
+        print("Clearing out postgresql [orders]")
+        self.truncate()
+
+        # - web/csv_test_datas/Test task - Postgres - deliveries.csv
+        # - web/csv_test_datas/Test task - Postgres - order_items.csv
+        # - web/csv_test_datas/Test task - Postgres - orders.csv
+
+        input_file = csv.DictReader(
+            open("csv_test_datas/Test task - Postgres - orders.csv")
+        )
+
+        orders = list()
+        max_per_record = 100000
+        orders = [dict(**row) for row in input_file]
+        _splits = split_to_max(orders, max_per_record)
+
+        try:
+            for _split in _splits:
+                    db.engine.execute(
+                        Orders.__table__.insert(),
+                        _split
+                    )
+        except Exception as e:
+            raise e
+
+        message = "Done load orders from csv"
+        print("Done loading csv to postgresql [orders]")
+        return {'message' : message}
+
+    def truncate(self):
+        """
+        @brief      Truncate out materials table
+
+        @return     self
+        """
+        # get new instance of the table
+        # intiate query
+        session = self.createSession()
+        # execute delete
+        session.execute("TRUNCATE TABLE {0}".format('orders'))
+        session.execute("SELECT setval('{0}_id_seq', 1);".format('orders'))
+
+        try:
+            session.commit()
+        except Exception as e:
+            print(e)
+            session.rollback()
+            raise
+        finally:
+            session.close()
 
 
 class OrderItemService(AbstractService):
@@ -236,3 +297,127 @@ class OrderItemService(AbstractService):
             result['items'] = str(e)
             db.session.rollback()
         return result
+
+    def load_from_csv(self):
+        print("Clearing out postgresql [order_items]")
+        self.truncate()
+
+        # - web/csv_test_datas/Test task - Postgres - deliveries.csv
+        # - web/csv_test_datas/Test task - Postgres - order_items.csv
+        # - web/csv_test_datas/Test task - Postgres - order_items.csv
+
+        input_file = csv.DictReader(
+            open("csv_test_datas/Test task - Postgres - order_items.csv")
+        )
+
+        order_items = list()
+        max_per_record = 100000
+        str_to_none = lambda i : i or None
+        order_items = [
+            {k: str_to_none(v) for k, v in dict(**row).items()}
+            for row in input_file
+        ]
+        _splits = split_to_max(order_items, max_per_record)
+
+        error = None
+        try:
+            for _split in _splits:
+                curr = _split
+                db.engine.execute(
+                    OrderItems.__table__.insert(),
+                    _split
+                )
+        except Exception as e:
+            error = (str(e))
+
+        message = "Done load order items from csv"
+        print("Done loading csv to postgresql [order_items]")
+        return {'message' : _splits, "error" : error}
+
+    def truncate(self):
+        """
+        @brief      Truncate out materials table
+
+        @return     self
+        """
+        # get new instance of the table
+        # intiate query
+        session = self.createSession()
+        # execute delete
+        session.execute("TRUNCATE TABLE {0}".format('order_items'))
+        session.execute("SELECT setval('{0}_id_seq', 1);".format('order_items'))
+
+        try:
+            session.commit()
+        except Exception as e:
+            print(e)
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
+
+class OrderDeliveriesService(AbstractService):
+    """docstring for OrderDeliveriesService"""
+
+    def __init__(self):
+        super(OrderDeliveriesService, self).__init__()
+        self.session = db.session
+
+    def load_from_csv(self):
+        print("Clearing out postgresql [order_deliveries]")
+        self.truncate()
+
+        # - web/csv_test_datas/Test task - Postgres - deliveries.csv
+        # - web/csv_test_datas/Test task - Postgres - deliveries.csv
+        # - web/csv_test_datas/Test task - Postgres - deliveries.csv
+
+        input_file = csv.DictReader(
+            open("csv_test_datas/Test task - Postgres - deliveries.csv")
+        )
+
+        order_deliveries = list()
+        max_per_record = 100000
+        str_to_none = lambda i : i or None
+        order_deliveries = [
+            {k: str_to_none(v) for k, v in dict(**row).items()}
+            for row in input_file
+        ]
+        _splits = split_to_max(order_deliveries, max_per_record)
+
+        error = None
+        try:
+            for _split in _splits:
+                curr = _split
+                db.engine.execute(
+                    OrderDeliveries.__table__.insert(),
+                    _split
+                )
+        except Exception as e:
+            raise e
+
+        message = "Done load order items from csv"
+        print("Done loading csv to postgresql [order_deliveries]")
+        return {'message' : _splits, "error" : error}
+
+    def truncate(self):
+        """
+        @brief      Truncate out materials table
+
+        @return     self
+        """
+        # get new instance of the table
+        # intiate query
+        session = self.createSession()
+        # execute delete
+        session.execute("TRUNCATE TABLE {0}".format('order_deliveries'))
+        session.execute("SELECT setval('{0}_id_seq', 1);".format('order_deliveries'))
+
+        try:
+            session.commit()
+        except Exception as e:
+            print(e)
+            session.rollback()
+            raise
+        finally:
+            session.close()
