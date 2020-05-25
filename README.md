@@ -25,5 +25,5 @@ Requirements:
 - Docker CE and Docker Compose
 
 ## Applications
-- [YELP GOOGLE VISION DEMO](https://github.com/jslmariano/remote_ph_exam_python/tree/develop/nginx/www/angular_ui)
-- [ORDER VUEJS MONGODB POSTGRESQL DEMO](https://github.com/jslmariano/remote_ph_exam_python/tree/develop/nginx/www/vue_ui)
+- [YELP GOOGLE VISION DEMO -> PYTHON, REDIS, JQUERY, ANGULAR](https://github.com/jslmariano/remote_ph_exam_python/tree/develop/nginx/www/angular_ui)
+- [ORDER DETAILS DEMO -> PYTHON, VUEJS, JQUERY, MONGODB, POSTGRESQL](https://github.com/jslmariano/remote_ph_exam_python/tree/develop/nginx/www/vue_ui)
